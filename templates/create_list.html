@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Movie List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        nav {
+            background-color: #333;
+            padding: 5px 0;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            width: 80%;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: yellow;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px 15px;
+            display: block;
+        }
+        nav ul li a:hover {
+            background-color: #575757;
+            border-radius: 4px;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"], select, textarea {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: calc(100% - 22px);
+            max-width: 300px;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('search') }}">Search Movies</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="content">
+        <h1>Create Movie List</h1>
+        <form action="{{ url_for('create_list') }}" method="POST">
+            <input type="text" name="title" value="{{ movie_details['title'] }}" readonly><br>
+            <input type="text" name="year" value="{{ movie_details['year'] }}" readonly><br>
+            <input type="text" name="imdb_id" value="{{ movie_details['imdb_id'] }}" readonly><br>
+            <input type="text" name="type" value="{{ movie_details['type'] }}" readonly><br>
+            {% if movie_details['poster'] != "N/A" %}
+                <img src="{{ movie_details['poster'] }}" alt="{{ movie_details['title'] }}" style="max-width: 100px;"><br>
+            {% endif %}
+            <input type="hidden" name="plot" value="{{ movie_details['plot'] }}">
+            <input type="text" name="poster" value="{{ movie_details['poster'] }}" readonly><br>
+            <input type="text" name="list_name" placeholder="List Name" required>
+            <label for="is_public">Public</label>
+            <input type="checkbox" name="is_public" value="true">
+            <input type="submit" value="Create List">
+        </form>
+    </div>
+</body>
+</html>

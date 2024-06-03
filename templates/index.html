@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Lists</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        nav {
+            background-color: #333;
+            padding: 5px 0;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            width: 80%;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: yellow;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px 15px;
+            display: block;
+        }
+        nav ul li a:hover {
+            background-color: #575757;
+            border-radius: 4px;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        .lists {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        ul li {
+            background-color: #fff;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        ul li:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+        .movie-list {
+            margin-top: 30px;
+            display: none;
+        }
+        .movie-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .movie-list ul li {
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            display: flex;
+            align-items: flex-start;
+        }
+        .movie-list ul li img {
+            max-width: 50px;
+            margin-right: 10px;
+            border-radius: 4px;
+        }
+        a.button {
+            display: inline-block;
+            padding: 10px 20px;
+            color: white;
+            background-color: #4CAF50;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        a.button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('search') }}">Search Movies</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="content">
+        <h1>My Movie Lists</h1>
+        <div class="lists">
+            <div>
+                <h2>Private Lists</h2>
+                <ul id="private-lists">
+                    {% for movie_list in user_lists %}
+                        <li data-list-id="{{ movie_list.id }}">{{ movie_list.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div>
+                <h2>Public Lists</h2>
+                <ul id="public-lists">
+                    {% for movie_list in public_lists %}
+                        <li data-list-id="{{ movie_list.id }}">{{ movie_list.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div id="movie-list" class="movie-list">
+            <h2 id="list-name"></h2>
+            <ul id="movies"></ul>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function addClickListeners(selector) {
+                document.querySelectorAll(selector).forEach(function(listItem) {
+                    listItem.addEventListener('click', function() {
+                        var listId = this.getAttribute('data-list-id');
+                        loadList(listId);
+                    });
+                });
+            }
+
+            addClickListeners('#private-lists li');
+            addClickListeners('#public-lists li');
+
+            function loadList(listId) {
+                fetch('/list/' + listId)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error(data.error);
+                        } else {
+                            displayMovieList(data);
+                        }
+                    })
+                    .catch(error => console.error('Error loading list:', error));
+            }
+
+            function displayMovieList(list) {
+                var moviesContainer = document.getElementById('movies');
+                var listNameHeader = document.getElementById('list-name');
+                moviesContainer.innerHTML = '';
+                listNameHeader.textContent = list.name;
+
+                list.movies.forEach(function(movie) {
+                    var movieItem = document.createElement('li');
+                    movieItem.innerHTML = `
+                        <img src="${movie.poster}" alt="${movie.title}">
+                        <div>
+                            <h3>${movie.title} (${movie.year})</h3>
+                            <p>${movie.plot}</p>
+                            <p><strong>IMDb ID:</strong> ${movie.imdb_id}</p>
+                            <p><strong>Type:</strong> ${movie.type}</p>
+                        </div>
+                    `;
+                    moviesContainer.appendChild(movieItem);
+                });
+
+                document.getElementById('movie-list').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

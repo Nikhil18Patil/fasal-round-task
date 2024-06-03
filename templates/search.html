@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Movies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        nav {
+            background-color: #333;
+            padding: 5px 0;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            width: 80%;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: yellow;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px 15px;
+            display: block;
+        }
+        nav ul li a:hover {
+            background-color: #575757;
+            border-radius: 4px;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"], select {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: calc(100% - 22px);
+            max-width: 300px;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('search') }}">Search Movies</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="content">
+        <h1>Search Movies</h1>
+        <form method="POST">
+            <input type="text" name="search" placeholder="Search by title">
+            <input type="text" name="imdb_id" placeholder="Search by IMDb ID">
+            <input type="text" name="type" placeholder="Type (movie, series, episode)">
+            <input type="text" name="year" placeholder="Year">
+            <select name="plot">
+                <option value="short">Short Plot</option>
+                <option value="full">Full Plot</option>
+            </select>
+            <input type="submit" value="Search">
+        </form>
+        {% if movies %}
+            <ul>
+                {% for movie in movies %}
+                    <li>
+                        <h2>{{ movie.Title }} ({{ movie.Year }})</h2>
+                        <p>{{ movie.Plot }}</p>
+                        <p><strong>IMDb ID:</strong> {{ movie.imdbID }}</p>
+                        <p><strong>Type:</strong> {{ movie.Type }}</p>
+                        
+                        {% if movie.Poster != "N/A" %}
+                            <p><img src="{{ movie.Poster }}" alt="{{ movie.Title }}" style="max-width: 100px;"></p>
+                        {% endif %}
+
+                        <a href="{{ url_for('create_list', title=movie.Title, year=movie.Year, imdb_id=movie.imdbID, type=movie.Type, plot=movie.Plot, poster=movie.Poster) }}">
+                            Add to List
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% elif error %}
+            <p>{{ error }}</p>
+        {% else %}
+            <p>No movies found. Try searching for something!</p>
+        {% endif %}
+    </div>
+</body>
+</html>
